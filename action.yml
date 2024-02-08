@@ -1,0 +1,40 @@
+name: S3 Artifact Upload
+description: Upload a file to S3 bucket using AWS SDK
+author: Alex Bern (@usualdesigner)
+branding:
+  icon: 'upload-cloud'
+  color: 'orange'
+inputs:
+  access-key-id:
+    description: AWS Access Key ID
+    required: true
+  secret-access-key:
+    description: AWS Secret Access Key
+    required: true
+  bucket-name:
+    description: S3 Bucket Name
+    required: true
+  region:
+    description: AWS Region
+    required: false
+    default: us-east-1
+  endpoint:
+    description: AWS Endpoint
+    required: false
+  acl:
+    description: S3 Object ACL
+    required: false
+  prefix:
+    description: S3 Object Prefix
+    required: false
+  file:
+    description: File to upload
+    required: true
+
+outputs:
+  output:
+    description: Result of the upload, see PutObjectCommand Output on https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand
+
+runs:
+  using: node20
+  main: dist/index.js
