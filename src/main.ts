@@ -4,31 +4,35 @@ import {
   PutObjectCommand,
   ObjectCannedACL,
 } from "@aws-sdk/client-s3";
-import { AwsCredentialIdentity } from "@aws-sdk/types";
 
 const handleInput = (): {
-  accessKeyId: string;
-  secretAccessKey: string;
   bucketName: string;
+  file: string;
+
+  accessKeyId?: string;
+  secretAccessKey?: string;
   region?: string;
   endpoint?: string;
   acl?: ObjectCannedACL;
   prefix?: string;
-  file: string;
 } => {
-  const accessKeyId = core.getInput("access-key-id", {
-    required: true,
-  });
-
-  const secretAccessKey = core.getInput("secret-access-key", {
-    required: true,
-  });
-
   const bucketName = core.getInput("bucket-name", {
     required: true,
   });
 
-  const region = core.getInput("region", {
+  const file = core.getInput("file", {
+    required: true,
+  });
+
+  const accessKeyId = core.getInput("aws-access-key-id", {
+    required: false,
+  });
+
+  const secretAccessKey = core.getInput("aws-secret-access-key", {
+    required: false,
+  });
+
+  const region = core.getInput("aws-region", {
     required: false,
   });
 
@@ -44,19 +48,15 @@ const handleInput = (): {
     required: false,
   });
 
-  const file = core.getInput("file", {
-    required: true,
-  });
-
   return {
-    accessKeyId,
-    secretAccessKey,
     bucketName,
+    file,
+    ...(accessKeyId ? { accessKeyId } : {}),
+    ...(secretAccessKey ? { secretAccessKey } : {}),
     ...(region ? { region } : {}),
     ...(endpoint ? { endpoint } : {}),
     ...(acl ? { acl } : {}),
     ...(prefix ? { prefix } : {}),
-    file,
   };
 };
 
@@ -72,13 +72,13 @@ export const run = async (): Promise<void> => {
     file,
   } = handleInput();
 
-  const credentials: AwsCredentialIdentity = {
-    accessKeyId,
-    secretAccessKey,
-  };
-
   const s3Client = new S3Client({
-    credentials,
+    ...(accessKeyId && secretAccessKey
+      ? {
+          accessKeyId,
+          secretAccessKey,
+        }
+      : {}),
     ...(region ? { region } : {}),
     ...(endpoint ? { endpoint } : {}),
   });

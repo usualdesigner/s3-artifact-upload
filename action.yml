@@ -5,16 +5,16 @@ branding:
   icon: 'upload-cloud'
   color: 'orange'
 inputs:
-  access-key-id:
-    description: AWS Access Key ID
-    required: true
-  secret-access-key:
-    description: AWS Secret Access Key
-    required: true
+#  aws-access-key-id:
+#    description: AWS Access Key ID
+#    required: true
+#  aws-secret-access-key:
+#    description: AWS Secret Access Key
+#    required: true
   bucket-name:
     description: S3 Bucket Name
     required: true
-  region:
+  aws-region:
     description: AWS Region
     required: false
     default: us-east-1

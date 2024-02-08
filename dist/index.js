@@ -56200,16 +56200,19 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const client_s3_1 = __nccwpck_require__(9250);
 const handleInput = () => {
-    const accessKeyId = core.getInput("access-key-id", {
-        required: true,
-    });
-    const secretAccessKey = core.getInput("secret-access-key", {
-        required: true,
-    });
     const bucketName = core.getInput("bucket-name", {
         required: true,
     });
-    const region = core.getInput("region", {
+    const file = core.getInput("file", {
+        required: true,
+    });
+    const accessKeyId = core.getInput("aws-access-key-id", {
+        required: false,
+    });
+    const secretAccessKey = core.getInput("aws-secret-access-key", {
+        required: false,
+    });
+    const region = core.getInput("aws-region", {
         required: false,
     });
     const endpoint = core.getInput("endpoint", {
@@ -56221,28 +56224,26 @@ const handleInput = () => {
     const prefix = core.getInput("prefix", {
         required: false,
     });
-    const file = core.getInput("file", {
-        required: true,
-    });
     return {
-        accessKeyId,
-        secretAccessKey,
         bucketName,
+        file,
+        ...(accessKeyId ? { accessKeyId } : {}),
+        ...(secretAccessKey ? { secretAccessKey } : {}),
         ...(region ? { region } : {}),
         ...(endpoint ? { endpoint } : {}),
         ...(acl ? { acl } : {}),
         ...(prefix ? { prefix } : {}),
-        file,
     };
 };
 const run = async () => {
     const { accessKeyId, secretAccessKey, bucketName, region, endpoint, acl, prefix, file, } = handleInput();
-    const credentials = {
-        accessKeyId,
-        secretAccessKey,
-    };
     const s3Client = new client_s3_1.S3Client({
-        credentials,
+        ...(accessKeyId && secretAccessKey
+            ? {
+                accessKeyId,
+                secretAccessKey,
+            }
+            : {}),
         ...(region ? { region } : {}),
         ...(endpoint ? { endpoint } : {}),
     });

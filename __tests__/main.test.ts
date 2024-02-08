@@ -33,9 +33,9 @@ describe("action", () => {
   it("sets the time output", async () => {
     getInputMock.mockImplementation((name: string): string => {
       switch (name) {
-        case "access-key-id":
+        case "aws-access-key-id":
           return "testAccessKeyId";
-        case "secret-access-key":
+        case "aws-secret-access-key":
           return "testSecretAccessKey";
         case "bucket-name":
           return "testBucketName";
