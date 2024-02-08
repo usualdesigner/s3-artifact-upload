@@ -5,19 +5,21 @@ branding:
   icon: 'upload-cloud'
   color: 'orange'
 inputs:
-#  aws-access-key-id:
-#    description: AWS Access Key ID
-#    required: true
-#  aws-secret-access-key:
-#    description: AWS Secret Access Key
-#    required: true
   bucket-name:
     description: S3 Bucket Name
     required: true
+  file:
+    description: File to upload
+    required: true
+  aws-access-key-id:
+    description: AWS Access Key ID
+    required: false
+  aws-secret-access-key:
+    description: AWS Secret Access Key
+    required: false
   aws-region:
     description: AWS Region
     required: false
-    default: us-east-1
   endpoint:
     description: AWS Endpoint
     required: false
@@ -27,9 +29,6 @@ inputs:
   prefix:
     description: S3 Object Prefix
     required: false
-  file:
-    description: File to upload
-    required: true
 
 outputs:
   output:

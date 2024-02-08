@@ -18,10 +18,10 @@ For authentication, it is strongly recommended to use the [`configure-aws-creden
 
     ```yaml
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-access-key-id: <your-access-key-id>
+        aws-secret-access-key: <your-secret-access-key>
         aws-region: <your-aws-region>
     ```
 
@@ -31,40 +31,15 @@ For authentication, it is strongly recommended to use the [`configure-aws-creden
     - name: Upload artifacts to AWS S3
       uses: usualdesigner/s3-artifact-upload@main
       with:
-        s3-bucket: "<your-s3-bucket-name>"
-        source-dir: "<path-to-your-artifacts>"
+        bucket-name: <your-bucket-name>
+        file: <your-file-name>
     ```
 
 ### Inputs
 
-- `s3-bucket`: The name of the S3 bucket where files will be uploaded.
-- `source-dir`: The local directory of the files to be uploaded.
+- `bucket-name`: The name of the S3 bucket where files will be uploaded.
+- `file`: The local file to be uploaded.
 
-## Example Workflow
+### Outputs
 
-Here is a sample workflow using `s3-artifact-upload` with secure authentication:
-
-```yaml
-name: Deploy to S3
-
-on: push
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ vars.ROLE_TO_ASSUME }}
-        role-session-name: ${{ vars.ROLE_SESSION_NAME }}
-        aws-region: ${{ env.AWS_REGION }}
-
-    - name: Upload artifacts to S3
-      uses: usualdesigner/s3-artifact-upload@v1.0.0
-      with:
-        bucket-name: ${{ vars.BUCKET }}
-        aws-region: ${{ env.AWS_REGION }}
-        file: file.json
+- `output`: Object of the PutObjectCommand Output, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand
