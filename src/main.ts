@@ -1,3 +1,5 @@
+import * as fs from "fs";
+import * as mime from "mime-types";
 import * as core from "@actions/core";
 import {
   S3Client,
@@ -83,11 +85,16 @@ export const run = async (): Promise<void> => {
     ...(endpoint ? { endpoint } : {}),
   });
 
+  const mime_type = mime.lookup(file);
+
   const putObjectCommand = new PutObjectCommand({
     Bucket: bucketName,
     Key: [prefix, file].filter(Boolean).join("/"),
-    Body: file,
+    Body: fs.readFileSync(file),
     ACL: acl,
+    ContentLength: fs.statSync(file).size,
+    ContentMD5: fs.readFileSync(file).toString("base64"),
+    ...(mime_type ? { ContentType: mime_type } : {}),
   });
 
   try {
