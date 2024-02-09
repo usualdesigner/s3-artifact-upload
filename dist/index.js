@@ -56415,6 +56415,7 @@ exports.run = void 0;
 const fs = __importStar(__nccwpck_require__(7147));
 const mime = __importStar(__nccwpck_require__(3583));
 const core = __importStar(__nccwpck_require__(2186));
+const crypto_1 = __nccwpck_require__(6113);
 const client_s3_1 = __nccwpck_require__(9250);
 const handleInput = () => {
     const bucketName = core.getInput("bucket-name", {
@@ -56452,6 +56453,11 @@ const handleInput = () => {
         ...(prefix ? { prefix } : {}),
     };
 };
+const getMd5 = (fileName) => {
+    const hasher = (0, crypto_1.createHash)("md5");
+    hasher.update(fs.readFileSync(fileName));
+    return hasher.digest("base64");
+};
 const run = async () => {
     const { accessKeyId, secretAccessKey, bucketName, region, endpoint, acl, prefix, file, } = handleInput();
     const s3Client = new client_s3_1.S3Client({
@@ -56471,7 +56477,7 @@ const run = async () => {
         Body: fs.readFileSync(file),
         ACL: acl,
         ContentLength: fs.statSync(file).size,
-        ContentMD5: fs.readFileSync(file).toString("base64"),
+        ContentMD5: getMd5(file),
         ...(mime_type ? { ContentType: mime_type } : {}),
     });
     try {

@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import * as mime from "mime-types";
 import * as core from "@actions/core";
+import { createHash } from "crypto";
 import {
   S3Client,
   PutObjectCommand,
@@ -62,6 +63,12 @@ const handleInput = (): {
   };
 };
 
+const getMd5 = (fileName: string): string => {
+  const hasher = createHash("md5");
+  hasher.update(fs.readFileSync(fileName));
+  return hasher.digest("base64");
+};
+
 export const run = async (): Promise<void> => {
   const {
     accessKeyId,
@@ -93,7 +100,7 @@ export const run = async (): Promise<void> => {
     Body: fs.readFileSync(file),
     ACL: acl,
     ContentLength: fs.statSync(file).size,
-    ContentMD5: fs.readFileSync(file).toString("base64"),
+    ContentMD5: getMd5(file),
     ...(mime_type ? { ContentType: mime_type } : {}),
   });
 
