@@ -56450,7 +56450,7 @@ const handleInput = () => {
     });
     let metaDataObject = {};
     try {
-        metaDataObject = JSON.parse(metaData);
+        metaDataObject = JSON.parse(metaData || "{}");
     }
     catch (error) {
         core.info("Error parsing meta-data");
