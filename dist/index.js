@@ -56442,6 +56442,10 @@ const handleInput = () => {
     const prefix = core.getInput("prefix", {
         required: false,
     });
+    const metaData = core.getInput("metadata", {
+        required: false,
+    });
+    const metaDataObject = JSON.parse(metaData);
     return {
         bucketName,
         file,
@@ -56451,6 +56455,7 @@ const handleInput = () => {
         ...(endpoint ? { endpoint } : {}),
         ...(acl ? { acl } : {}),
         ...(prefix ? { prefix } : {}),
+        ...(metaData ? { metaData: metaDataObject } : {}),
     };
 };
 const getMd5 = (fileName) => {
@@ -56459,7 +56464,7 @@ const getMd5 = (fileName) => {
     return hasher.digest("base64");
 };
 const run = async () => {
-    const { accessKeyId, secretAccessKey, bucketName, region, endpoint, acl, prefix, file, } = handleInput();
+    const { accessKeyId, secretAccessKey, bucketName, region, endpoint, acl, prefix, file, metaData, } = handleInput();
     const s3Client = new client_s3_1.S3Client({
         ...(accessKeyId && secretAccessKey
             ? {
@@ -56479,6 +56484,7 @@ const run = async () => {
         ContentLength: fs.statSync(file).size,
         ContentMD5: getMd5(file),
         ...(mime_type ? { ContentType: mime_type } : {}),
+        ...(metaData ? { Metadata: metaData } : {}),
     });
     try {
         const putObjectCommandOutput = await s3Client.send(putObjectCommand);

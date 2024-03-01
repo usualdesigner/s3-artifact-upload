@@ -18,6 +18,7 @@ const handleInput = (): {
   endpoint?: string;
   acl?: ObjectCannedACL;
   prefix?: string;
+  metaData?: Record<string, string>;
 } => {
   const bucketName = core.getInput("bucket-name", {
     required: true,
@@ -51,6 +52,12 @@ const handleInput = (): {
     required: false,
   });
 
+  const metaData = core.getInput("metadata", {
+    required: false,
+  });
+
+  const metaDataObject = JSON.parse(metaData);
+
   return {
     bucketName,
     file,
@@ -60,6 +67,7 @@ const handleInput = (): {
     ...(endpoint ? { endpoint } : {}),
     ...(acl ? { acl } : {}),
     ...(prefix ? { prefix } : {}),
+    ...(metaData ? { metaData: metaDataObject } : {}),
   };
 };
 
@@ -79,6 +87,7 @@ export const run = async (): Promise<void> => {
     acl,
     prefix,
     file,
+    metaData,
   } = handleInput();
 
   const s3Client = new S3Client({
@@ -102,6 +111,7 @@ export const run = async (): Promise<void> => {
     ContentLength: fs.statSync(file).size,
     ContentMD5: getMd5(file),
     ...(mime_type ? { ContentType: mime_type } : {}),
+    ...(metaData ? { Metadata: metaData } : {}),
   });
 
   try {
