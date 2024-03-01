@@ -43,7 +43,7 @@ describe("Main test suite", () => {
           return "test";
         case "file":
           return "file.txt";
-        case "metadata":
+        case "meta-data":
           return '{"key1": "value1", "key2": "value2"}';
         default:
           return "";

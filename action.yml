@@ -29,6 +29,9 @@ inputs:
   prefix:
     description: S3 Object Prefix
     required: false
+  meta-data:
+    description: S3 Object Metadata
+    required: false
 
 outputs:
   output:

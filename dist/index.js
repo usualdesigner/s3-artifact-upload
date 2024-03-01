@@ -56442,10 +56442,16 @@ const handleInput = () => {
     const prefix = core.getInput("prefix", {
         required: false,
     });
-    const metaData = core.getInput("metadata", {
+    const metaData = core.getInput("meta-data", {
         required: false,
     });
-    const metaDataObject = JSON.parse(metaData);
+    let metaDataObject = {};
+    try {
+        metaDataObject = JSON.parse(metaData);
+    }
+    catch (error) {
+        core.info("Error parsing meta-data");
+    }
     return {
         bucketName,
         file,

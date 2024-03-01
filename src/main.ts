@@ -52,11 +52,17 @@ const handleInput = (): {
     required: false,
   });
 
-  const metaData = core.getInput("metadata", {
+  const metaData = core.getInput("meta-data", {
     required: false,
   });
 
-  const metaDataObject = JSON.parse(metaData);
+  let metaDataObject = {};
+
+  try {
+    metaDataObject = JSON.parse(metaData);
+  } catch (error: unknown) {
+    core.info("Error parsing meta-data");
+  }
 
   return {
     bucketName,
