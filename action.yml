@@ -32,6 +32,9 @@ inputs:
   meta-data:
     description: S3 Object Metadata
     required: false
+  cache-control:
+    description: S3 Object Cache Control
+    required: false
 
 outputs:
   output:

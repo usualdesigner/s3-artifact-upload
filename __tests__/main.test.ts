@@ -45,6 +45,8 @@ describe("Main test suite", () => {
           return "file.txt";
         case "meta-data":
           return '{"key1": "value1", "key2": "value2"}';
+        case "cache-control":
+          return "max-age=100";
         default:
           return "";
       }

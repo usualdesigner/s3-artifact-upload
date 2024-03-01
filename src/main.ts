@@ -19,6 +19,7 @@ const handleInput = (): {
   acl?: ObjectCannedACL;
   prefix?: string;
   metaData?: Record<string, string>;
+  cacheControl?: string;
 } => {
   const bucketName = core.getInput("bucket-name", {
     required: true,
@@ -56,6 +57,10 @@ const handleInput = (): {
     required: false,
   });
 
+  const cacheControl = core.getInput("cache-control", {
+    required: false,
+  });
+
   let metaDataObject = {};
 
   try {
@@ -74,6 +79,7 @@ const handleInput = (): {
     ...(acl ? { acl } : {}),
     ...(prefix ? { prefix } : {}),
     ...(metaData ? { metaData: metaDataObject } : {}),
+    ...(cacheControl ? { cacheControl } : {}),
   };
 };
 
@@ -94,6 +100,7 @@ export const run = async (): Promise<void> => {
     prefix,
     file,
     metaData,
+    cacheControl,
   } = handleInput();
 
   const s3Client = new S3Client({
@@ -118,6 +125,7 @@ export const run = async (): Promise<void> => {
     ContentMD5: getMd5(file),
     ...(mime_type ? { ContentType: mime_type } : {}),
     ...(metaData ? { Metadata: metaData } : {}),
+    ...(cacheControl ? { CacheControl: cacheControl } : {}),
   });
 
   try {
