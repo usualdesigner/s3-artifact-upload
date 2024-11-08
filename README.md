@@ -60,4 +60,4 @@ files to S3:
 
 ### Outputs
 
-- `output`: Object of the PutObjectCommand Output, see <https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand>
+- `putObjectCommandOutput`: Object of the PutObjectCommand Output, see <https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand>
