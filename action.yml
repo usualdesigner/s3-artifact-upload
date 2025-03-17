@@ -37,7 +37,7 @@ inputs:
     required: false
 
 outputs:
-  output:
+  putObjectCommandOutput:
     description: Result of the upload, see PutObjectCommand Output on https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand
 
 runs:
