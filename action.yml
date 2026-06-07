@@ -1,5 +1,5 @@
 name: S3 Artifact Upload
-description: Upload a file to S3 bucket using AWS SDK
+description: Upload one or more files (globs or directories) to an S3 bucket using the AWS SDK
 author: Alex Bern (@usualdesigner)
 branding:
   icon: 'upload-cloud'
