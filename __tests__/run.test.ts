@@ -75,4 +75,53 @@ describe("run", () => {
     expect(JSON.parse(outputs["failed"])).toHaveLength(1);
     expect(failed).toMatch(/1 of 2/);
   });
+
+  it("empty resolve → empty outputs, no failure", async () => {
+    jest.spyOn(resolveMod, "resolveFiles").mockResolvedValue([]);
+    const uploadSpy = jest
+      .spyOn(uploadMod, "uploadFile")
+      .mockResolvedValue({ path: "x", key: "x", bucket: "b", size: 1 });
+
+    await run();
+
+    expect(outputs["results"]).toBe("[]");
+    expect(outputs["failed"]).toBe("[]");
+    expect(outputs["object-count"]).toBe("0");
+    expect(outputs["keys"]).toBe("");
+    expect(outputs["locations"]).toBe("");
+    expect(failed).toBeUndefined();
+    expect(uploadSpy).not.toHaveBeenCalled();
+  });
+
+  it("fail-fast: true stops scheduling after first failure", async () => {
+    jest
+      .spyOn(inputsMod, "parseInputs")
+      .mockReturnValue(fakeInputs({ failFast: true, concurrency: 1 }));
+    const threeItems: UploadItem[] = [
+      { absPath: "/a", path: "a", key: "a", size: 1 },
+      { absPath: "/b", path: "b", key: "b", size: 1 },
+      { absPath: "/c", path: "c", key: "c", size: 1 },
+    ];
+    jest.spyOn(resolveMod, "resolveFiles").mockResolvedValue(threeItems);
+    const uploadSpy = jest
+      .spyOn(uploadMod, "uploadFile")
+      .mockRejectedValueOnce(new Error("first fails"))
+      .mockResolvedValue({ path: "b", key: "b", bucket: "b", size: 1 });
+
+    await run();
+
+    expect(uploadSpy).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(outputs["failed"])).toHaveLength(1);
+    expect(failed).toBeDefined();
+  });
+
+  it("top-level error → setFailed with message", async () => {
+    jest.spyOn(inputsMod, "parseInputs").mockImplementation(() => {
+      throw new Error("bad input");
+    });
+
+    await run();
+
+    expect(failed).toMatch(/bad input/);
+  });
 });
