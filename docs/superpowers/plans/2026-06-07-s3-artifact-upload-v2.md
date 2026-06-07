@@ -1591,8 +1591,12 @@ Expected: Check dist/, Continuous Integration, Lint Codebase, CodeQL all pass.
 
 - Commit messages must not mention AI assistants (user preference).
 - Keep each file focused; do not re-merge modules back into one file.
-- `@actions/glob` treats lines starting with `!` as excludes — that is why
-  `resolve.ts` appends `!`-prefixed exclude patterns.
+- DEVIATION (applied during execution): `resolve.ts` uses `fast-glob` directly
+  instead of `@actions/glob`. `@actions/glob@0.7.0` is ESM-only and cannot be
+  required by the CJS Jest setup, which forced the tests to validate a stand-in
+  library. Using `fast-glob` (CJS) directly makes production and tests exercise
+  the same real library. Excludes are passed via fast-glob's `ignore` option;
+  directory entries are expanded to `<dir>/**/*`.
 - `aws-sdk-client-mock` intercepts `lib-storage`'s `Upload` because small files
   issue a single `PutObjectCommand`; do not assert on multipart commands for the
   small test fixtures.

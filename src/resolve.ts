@@ -36,6 +36,9 @@ export async function resolveFiles(
   });
 
   const base = path.resolve(inputs.baseDirectory);
+  // fast-glob already de-duplicates across overlapping patterns; `seen` is a
+  // defensive guard so the key-collision check below only ever fires on two
+  // genuinely different source files, never on the same path seen twice.
   const seen = new Set<string>();
   const keyToPath = new Map<string, string>();
   const items: UploadItem[] = [];
