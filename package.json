@@ -69,9 +69,9 @@
   },
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "@actions/glob": "^0.7.0",
     "@aws-sdk/client-s3": "^3.893.0",
     "@aws-sdk/lib-storage": "^3.1063.0",
+    "fast-glob": "^3.3.3",
     "mime": "^4.1.0",
     "mime-types": "^2.1.35"
   },

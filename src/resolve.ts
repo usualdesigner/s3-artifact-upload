@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as glob from "@actions/glob";
+import fg from "fast-glob";
 import * as core from "@actions/core";
 import type { ActionInputs, UploadItem } from "./types";
 
@@ -9,26 +9,39 @@ function toKey(prefix: string | undefined, keyBody: string): string {
   return joined.replace(/\/{2,}/g, "/").replace(/^\//, "");
 }
 
+// Expand each input path entry: an existing directory becomes a recursive
+// `<entry>/**/*` glob, while files and globs are passed through unchanged.
+function expandEntry(entry: string): string {
+  try {
+    if (fs.statSync(entry).isDirectory()) {
+      return `${entry}/**/*`;
+    }
+  } catch {
+    // Not an existing path on disk — treat it as a glob/literal.
+  }
+  return entry;
+}
+
 export async function resolveFiles(
   inputs: ActionInputs,
 ): Promise<UploadItem[]> {
-  const patterns = [
-    ...inputs.paths,
-    ...inputs.exclude.map((e) => `!${e}`),
-  ].join("\n");
+  const patterns = inputs.paths.map(expandEntry);
 
-  const globber = await glob.create(patterns, {
+  const matches = await fg(patterns, {
+    dot: true,
+    onlyFiles: true,
+    absolute: true,
     followSymbolicLinks: false,
-    matchDirectories: false,
+    ignore: inputs.exclude,
   });
-  const matches = await globber.glob();
 
   const base = path.resolve(inputs.baseDirectory);
   const seen = new Set<string>();
   const keyToPath = new Map<string, string>();
   const items: UploadItem[] = [];
 
-  for (const absPath of matches) {
+  for (const match of matches) {
+    const absPath = path.normalize(match);
     if (seen.has(absPath)) continue;
     seen.add(absPath);
 

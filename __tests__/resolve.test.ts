@@ -48,6 +48,18 @@ describe("resolveFiles", () => {
     expect(items.find((i) => i.key === "web/a/b.js")?.size).toBe(2);
   });
 
+  it("recurses into a directory path and uploads all files under it", async () => {
+    const items = await resolveFiles(
+      baseInputs({
+        paths: [path.join(dir, "dist")],
+        baseDirectory: path.join(dir, "dist"),
+        prefix: "web",
+      }),
+    );
+    const keys = items.map((i) => i.key).sort();
+    expect(keys).toEqual(["web/a/b.js", "web/app.js", "web/skip.map"]);
+  });
+
   it("applies excludes", async () => {
     const items = await resolveFiles(
       baseInputs({

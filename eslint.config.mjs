@@ -15,7 +15,6 @@ export default [
       "coverage/",
       "node_modules/",
       "badges/",
-      "__mocks__/",
       "eslint.config.mjs",
       "**/*.json",
     ],
