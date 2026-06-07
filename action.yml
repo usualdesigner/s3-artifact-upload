@@ -41,5 +41,5 @@ outputs:
     description: Result of the upload, see PutObjectCommand Output on https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand
 
 runs:
-  using: node20
+  using: node24
   main: dist/index.js
