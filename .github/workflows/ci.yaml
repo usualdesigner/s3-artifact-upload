@@ -42,6 +42,15 @@ jobs:
         id: npm-ci-test
         run: npm run ci-test
 
+      - name: Changeset Status
+        id: changeset-status
+        if: >-
+          github.event_name == 'pull_request' &&
+          !startsWith(github.head_ref, 'changeset-release/')
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          npx changeset status --since=origin/${{ github.base_ref }}
+
   test-action:
     name: GitHub Actions Test
     runs-on: ubuntu-latest
