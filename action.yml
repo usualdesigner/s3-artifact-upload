@@ -5,12 +5,33 @@ branding:
   icon: 'upload-cloud'
   color: 'orange'
 inputs:
+  path:
+    description: Newline-separated list of files, directories, or globs to upload
+    required: false
+  file:
+    description: "[Deprecated] Single file to upload. Use `path` instead."
+    required: false
   bucket-name:
     description: S3 Bucket Name
     required: true
-  file:
-    description: File to upload
-    required: true
+  exclude:
+    description: Newline-separated glob patterns to exclude from matches
+    required: false
+  base-directory:
+    description: Directory that object keys are derived relative to
+    required: false
+    default: "."
+  preserve-structure:
+    description: Keep the directory structure in the object key
+    required: false
+    default: "true"
+  prefix:
+    description: Key prefix prepended to every object
+    required: false
+  if-no-files-found:
+    description: Behavior when no files match (warn, error, ignore)
+    required: false
+    default: warn
   aws-access-key-id:
     description: AWS Access Key ID
     required: false
@@ -21,24 +42,64 @@ inputs:
     description: AWS Region
     required: false
   endpoint:
-    description: AWS Endpoint
+    description: Custom S3 endpoint URL
     required: false
   acl:
     description: S3 Object ACL
     required: false
-  prefix:
-    description: S3 Object Prefix
+  cache-control:
+    description: S3 Object Cache-Control
+    required: false
+  content-encoding:
+    description: S3 Object Content-Encoding
+    required: false
+  content-disposition:
+    description: S3 Object Content-Disposition
+    required: false
+  content-type:
+    description: Override the auto-detected Content-Type
     required: false
   meta-data:
-    description: S3 Object Metadata
+    description: JSON object of custom S3 object metadata
     required: false
-  cache-control:
-    description: S3 Object Cache Control
+  storage-class:
+    description: S3 storage class (e.g. STANDARD_IA, GLACIER)
     required: false
+  server-side-encryption:
+    description: Server-side encryption (AES256 or aws:kms)
+    required: false
+  kms-key-id:
+    description: KMS key id (requires server-side-encryption aws:kms)
+    required: false
+  tagging:
+    description: Object tags as a JSON object or query string
+    required: false
+  checksum-algorithm:
+    description: Integrity checksum algorithm (SHA256, SHA1, CRC32, CRC32C, none)
+    required: false
+    default: SHA256
+  concurrency:
+    description: Max number of files uploaded in parallel
+    required: false
+    default: "5"
+  fail-fast:
+    description: Stop after the first upload failure
+    required: false
+    default: "false"
 
 outputs:
-  putObjectCommandOutput:
-    description: Result of the upload, see PutObjectCommand Output on https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/s3/command/PutObjectCommand
+  results:
+    description: >-
+      JSON array of successful uploads
+      (path, key, bucket, etag, versionId, location, size)
+  failed:
+    description: JSON array of failed uploads (path, key, error)
+  object-count:
+    description: Number of objects uploaded successfully
+  keys:
+    description: Newline-separated list of uploaded object keys
+  locations:
+    description: Newline-separated list of uploaded object URLs
 
 runs:
   using: node24
