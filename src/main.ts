@@ -65,7 +65,7 @@ const handleInput = (): {
 
   try {
     metaDataObject = JSON.parse(metaData || "{}");
-  } catch (error: unknown) {
+  } catch {
     core.info("Error parsing meta-data");
   }
 
