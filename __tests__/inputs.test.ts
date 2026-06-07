@@ -40,3 +40,55 @@ describe("parseInputs", () => {
     expect(inputs.failFast).toBe(false);
   });
 });
+
+describe("parseInputs validation and parsing", () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it("parses meta-data JSON into an object", () => {
+    mockInputs({
+      path: "a.txt",
+      "bucket-name": "b",
+      "meta-data": '{"k1":"v1","k2":"v2"}'
+    });
+    expect(parseInputs().metaData).toEqual({ k1: "v1", k2: "v2" });
+  });
+
+  it("throws on malformed meta-data JSON", () => {
+    mockInputs({ path: "a.txt", "bucket-name": "b", "meta-data": "{nope" });
+    expect(() => parseInputs()).toThrow(/meta-data/);
+  });
+
+  it("encodes a tagging object as a query string", () => {
+    mockInputs({
+      path: "a.txt",
+      "bucket-name": "b",
+      tagging: '{"team":"infra","env":"prod"}'
+    });
+    expect(parseInputs().tagging).toBe("team=infra&env=prod");
+  });
+
+  it("passes through a tagging query string", () => {
+    mockInputs({ path: "a.txt", "bucket-name": "b", tagging: "a=1&b=2" });
+    expect(parseInputs().tagging).toBe("a=1&b=2");
+  });
+
+  it("maps checksum-algorithm none to undefined", () => {
+    mockInputs({ path: "a.txt", "bucket-name": "b", "checksum-algorithm": "none" });
+    expect(parseInputs().checksumAlgorithm).toBeUndefined();
+  });
+
+  it("throws when kms-key-id is set without aws:kms", () => {
+    mockInputs({ path: "a.txt", "bucket-name": "b", "kms-key-id": "abc" });
+    expect(() => parseInputs()).toThrow(/aws:kms/);
+  });
+
+  it("throws on both path and file", () => {
+    mockInputs({ path: "a.txt", file: "b.txt", "bucket-name": "b" });
+    expect(() => parseInputs()).toThrow(/either `path` or `file`/);
+  });
+
+  it("throws on an unknown checksum-algorithm", () => {
+    mockInputs({ path: "a.txt", "bucket-name": "b", "checksum-algorithm": "MD5" });
+    expect(() => parseInputs()).toThrow(/checksum-algorithm/);
+  });
+});
