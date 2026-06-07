@@ -1,19 +1,10 @@
 import "aws-sdk-client-mock-jest";
-import * as fs from "fs";
+import fs from "fs";
+import type { ReadStream } from "fs";
 import { mockClient } from "aws-sdk-client-mock";
-import {
-  S3Client,
-  PutObjectCommand,
-  CreateMultipartUploadCommand,
-} from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { uploadFile } from "../src/upload";
 import type { ActionInputs, UploadItem } from "../src/types";
-
-// Node 24 marks fs properties non-configurable; use module-level mock instead.
-jest.mock("fs", () => ({
-  ...jest.requireActual<typeof fs>("fs"),
-  createReadStream: jest.fn(),
-}));
 
 const s3Mock = mockClient(S3Client);
 
@@ -43,11 +34,11 @@ describe("uploadFile", () => {
   beforeEach(() => {
     s3Mock.reset();
     s3Mock.on(PutObjectCommand).resolves({ ETag: '"abc"', VersionId: "v1" });
-    (fs.createReadStream as jest.Mock).mockReturnValue(
-      Buffer.from("xyz") as unknown as fs.ReadStream,
-    );
+    jest
+      .spyOn(fs, "createReadStream")
+      .mockReturnValue(Buffer.from("xyz") as unknown as ReadStream);
   });
-  afterEach(() => jest.clearAllMocks());
+  afterEach(() => jest.restoreAllMocks());
 
   it("uploads with mapped params and returns a result", async () => {
     const client = new S3Client({ region: "us-east-1" });
@@ -64,6 +55,7 @@ describe("uploadFile", () => {
       }),
     );
 
+    expect(fs.createReadStream).toHaveBeenCalledWith("/tmp/app.js");
     expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {
       Bucket: "my-bucket",
       Key: "web/app.js",
@@ -90,7 +82,12 @@ describe("uploadFile", () => {
     const call = s3Mock.commandCalls(PutObjectCommand)[0];
     expect(call.args[0].input.ChecksumAlgorithm).toBeUndefined();
   });
-});
 
-// Keeps the unused import meaningful for readers; multipart is exercised by lib-storage.
-void CreateMultipartUploadCommand;
+  it("auto-detects ContentType from file extension when contentType is not set", async () => {
+    const client = new S3Client({ region: "us-east-1" });
+    await uploadFile(client, item, inputs({ contentType: undefined }));
+    expect(s3Mock).toHaveReceivedCommandWith(PutObjectCommand, {
+      ContentType: "application/javascript",
+    });
+  });
+});
