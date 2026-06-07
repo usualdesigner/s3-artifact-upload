@@ -20,6 +20,11 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v5
+        with:
+          # super-linter needs the full history and the default branch ref
+          # available to resolve DEFAULT_BRANCH; a shallow clone makes it
+          # fail with "Neither main, nor origin/main exist".
+          fetch-depth: 0
 
       - name: Setup Node.js
         id: setup-node
