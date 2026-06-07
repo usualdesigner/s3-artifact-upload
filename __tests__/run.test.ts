@@ -39,6 +39,7 @@ describe("run", () => {
       failed = String(m);
     });
     jest.spyOn(core, "info").mockImplementation(() => {});
+    jest.spyOn(core, "error").mockImplementation(() => {});
     jest.spyOn(inputsMod, "parseInputs").mockReturnValue(fakeInputs());
     jest.spyOn(resolveMod, "resolveFiles").mockResolvedValue(items);
   });
@@ -74,6 +75,7 @@ describe("run", () => {
     expect(JSON.parse(outputs["results"])).toHaveLength(1);
     expect(JSON.parse(outputs["failed"])).toHaveLength(1);
     expect(failed).toMatch(/1 of 2/);
+    expect(core.error).toHaveBeenCalledTimes(1);
   });
 
   it("empty resolve → empty outputs, no failure", async () => {
@@ -112,6 +114,8 @@ describe("run", () => {
 
     expect(uploadSpy).toHaveBeenCalledTimes(1);
     expect(JSON.parse(outputs["failed"])).toHaveLength(1);
+    expect(JSON.parse(outputs["results"])).toHaveLength(0);
+    expect(outputs["object-count"]).toBe("0");
     expect(failed).toBeDefined();
   });
 

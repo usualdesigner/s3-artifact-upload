@@ -5,6 +5,9 @@ import { resolveFiles } from "./resolve";
 import { uploadFile } from "./upload";
 import type { ActionInputs, UploadItem, UploadResult } from "./types";
 
+const errorMessage = (error: unknown): string =>
+  error instanceof Error ? error.message : String(error);
+
 interface Failure {
   path: string;
   key: string;
@@ -30,10 +33,13 @@ async function uploadAll(
         results.push(await uploadFile(client, item, inputs));
         core.info(`Uploaded ${item.path} -> ${item.key}`);
       } catch (error) {
+        core.error(
+          `Failed to upload ${item.path} -> ${item.key}: ${errorMessage(error)}`,
+        );
         failures.push({
           path: item.path,
           key: item.key,
-          error: (error as Error).message,
+          error: errorMessage(error),
         });
         if (inputs.failFast) stop = true;
       }
@@ -89,6 +95,6 @@ export const run = async (): Promise<void> => {
       core.setFailed(`${failures.length} of ${items.length} uploads failed.`);
     }
   } catch (error) {
-    core.setFailed((error as Error).message);
+    core.setFailed(errorMessage(error));
   }
 };
