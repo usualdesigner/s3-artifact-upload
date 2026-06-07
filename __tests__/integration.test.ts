@@ -43,6 +43,11 @@ describe("run — end-to-end integration", () => {
     });
     jest.spyOn(core, "getInput").mockImplementation((name) => {
       if (name === "bucket-name") return "test-bucket";
+      // Provide explicit region + credentials so the client is fully specified
+      // and the test does not depend on ambient AWS config (which is absent in CI).
+      if (name === "aws-region") return "us-east-1";
+      if (name === "aws-access-key-id") return "test-access-key";
+      if (name === "aws-secret-access-key") return "test-secret-key";
       if (name === "base-directory") return tmpDir;
       if (name === "prefix") return "web";
       if (name === "concurrency") return "5";
