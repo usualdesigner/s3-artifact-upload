@@ -6,7 +6,7 @@ function mockInputs(values: Record<string, string>): void {
   jest
     .spyOn(core, "getMultilineInput")
     .mockImplementation((name) =>
-      (values[name] ?? "").split("\n").filter((l) => l.trim() !== "")
+      (values[name] ?? "").split("\n").filter((l) => l.trim() !== ""),
     );
   jest
     .spyOn(core, "getBooleanInput")
@@ -24,7 +24,7 @@ describe("parseInputs", () => {
       "base-directory": "dist",
       "preserve-structure": "true",
       prefix: "web",
-      concurrency: "8"
+      concurrency: "8",
     });
 
     const inputs = parseInputs();
@@ -48,7 +48,7 @@ describe("parseInputs validation and parsing", () => {
     mockInputs({
       path: "a.txt",
       "bucket-name": "b",
-      "meta-data": '{"k1":"v1","k2":"v2"}'
+      "meta-data": '{"k1":"v1","k2":"v2"}',
     });
     expect(parseInputs().metaData).toEqual({ k1: "v1", k2: "v2" });
   });
@@ -62,7 +62,7 @@ describe("parseInputs validation and parsing", () => {
     mockInputs({
       path: "a.txt",
       "bucket-name": "b",
-      tagging: '{"team":"infra","env":"prod"}'
+      tagging: '{"team":"infra","env":"prod"}',
     });
     expect(parseInputs().tagging).toBe("team=infra&env=prod");
   });
@@ -73,7 +73,11 @@ describe("parseInputs validation and parsing", () => {
   });
 
   it("maps checksum-algorithm none to undefined", () => {
-    mockInputs({ path: "a.txt", "bucket-name": "b", "checksum-algorithm": "none" });
+    mockInputs({
+      path: "a.txt",
+      "bucket-name": "b",
+      "checksum-algorithm": "none",
+    });
     expect(parseInputs().checksumAlgorithm).toBeUndefined();
   });
 
@@ -88,7 +92,47 @@ describe("parseInputs validation and parsing", () => {
   });
 
   it("throws on an unknown checksum-algorithm", () => {
-    mockInputs({ path: "a.txt", "bucket-name": "b", "checksum-algorithm": "MD5" });
+    mockInputs({
+      path: "a.txt",
+      "bucket-name": "b",
+      "checksum-algorithm": "MD5",
+    });
     expect(() => parseInputs()).toThrow(/checksum-algorithm/);
+  });
+
+  it("uses file as paths and emits a deprecation warning when path is empty", () => {
+    const warnSpy = jest.spyOn(core, "warning").mockImplementation(() => {});
+    mockInputs({ file: "artifact.zip", "bucket-name": "b" });
+
+    const inputs = parseInputs();
+
+    expect(inputs.paths).toEqual(["artifact.zip"]);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("`file` is deprecated"),
+    );
+  });
+
+  it("throws when neither path nor file is provided", () => {
+    mockInputs({ "bucket-name": "b" });
+    expect(() => parseInputs()).toThrow(/One of `path` or `file` is required/);
+  });
+
+  it("throws on invalid concurrency value of zero", () => {
+    mockInputs({ path: "a.txt", "bucket-name": "b", concurrency: "0" });
+    expect(() => parseInputs()).toThrow(/concurrency/);
+  });
+
+  it("throws on non-numeric concurrency value", () => {
+    mockInputs({ path: "a.txt", "bucket-name": "b", concurrency: "abc" });
+    expect(() => parseInputs()).toThrow(/concurrency/);
+  });
+
+  it("throws on an invalid if-no-files-found value", () => {
+    mockInputs({
+      path: "a.txt",
+      "bucket-name": "b",
+      "if-no-files-found": "boom",
+    });
+    expect(() => parseInputs()).toThrow(/if-no-files-found/);
   });
 });

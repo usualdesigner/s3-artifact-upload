@@ -2,7 +2,7 @@ import type {
   ObjectCannedACL,
   StorageClass,
   ServerSideEncryption,
-  ChecksumAlgorithm
+  ChecksumAlgorithm,
 } from "@aws-sdk/client-s3";
 
 export interface ActionInputs {
