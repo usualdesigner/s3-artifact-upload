@@ -1,7 +1,7 @@
 {
   "name": "s3-artifact-upload",
   "description": "An action to upload files to an S3 bucket",
-  "version": "1.0.0",
+  "version": "1.0.17",
   "author": "Alex Bern (@usualdesigner)",
   "private": true,
   "homepage": "https://github.com/usualdesigner/s3-artifact-upload",
@@ -33,6 +33,9 @@
     "format:check": "prettier --check **/*.{js,ts}",
     "lint": "npx eslint .",
     "package:watch": "npm run package -- --watch",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "release:publish": "node script/publish.mjs",
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg",
     "all": "npm run format:write && npm run lint && npm run test && npm run package",
     "package": "ncc build src/index.ts --license licenses.txt"
@@ -76,6 +79,8 @@
     "mime-types": "^2.1.35"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.7.0",
+    "@changesets/cli": "^2.31.0",
     "@types/jest": "^29.5.14",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^24.5.2",
