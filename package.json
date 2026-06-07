@@ -1,7 +1,7 @@
 {
   "name": "s3-artifact-upload",
   "description": "An action to upload files to an S3 bucket",
-  "version": "1.0.0",
+  "version": "1.0.17",
   "author": "Alex Bern (@usualdesigner)",
   "private": true,
   "homepage": "https://github.com/usualdesigner/s3-artifact-upload",
@@ -24,7 +24,7 @@
     ".": "./dist/index.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "bundle": "npm run format:write && npm run package",
@@ -33,6 +33,9 @@
     "format:check": "prettier --check **/*.{js,ts}",
     "lint": "npx eslint .",
     "package:watch": "npm run package -- --watch",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "release:publish": "node script/publish.mjs",
     "test": "(jest && make-coverage-badge --output-path ./badges/coverage.svg) || make-coverage-badge --output-path ./badges/coverage.svg",
     "all": "npm run format:write && npm run lint && npm run test && npm run package",
     "package": "ncc build src/index.ts --license licenses.txt"
@@ -70,16 +73,21 @@
   "dependencies": {
     "@actions/core": "^1.11.1",
     "@aws-sdk/client-s3": "^3.893.0",
-    "mime": "^4.1.0",
+    "@aws-sdk/lib-storage": "^3.1063.0",
+    "fast-glob": "^3.3.3",
     "mime-types": "^2.1.35"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.7.0",
+    "@changesets/cli": "^2.31.0",
     "@types/jest": "^29.5.14",
     "@types/mime-types": "^2.1.4",
     "@types/node": "^24.5.2",
     "@typescript-eslint/eslint-plugin": "^8.48.0",
     "@typescript-eslint/parser": "^8.48.0",
     "@vercel/ncc": "^0.38.4",
+    "aws-sdk-client-mock": "^4.1.0",
+    "aws-sdk-client-mock-jest": "^4.1.0",
     "eslint": "^9.39.4",
     "eslint-plugin-github": "^6.0.0",
     "eslint-plugin-jest": "^29.0.1",

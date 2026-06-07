@@ -18,6 +18,9 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v6
+        with:
+          # Full history so `changeset status` can find the merge-base with main.
+          fetch-depth: 0
 
       - name: Setup Node.js
         id: setup-node
@@ -41,6 +44,15 @@ jobs:
       - name: Test
         id: npm-ci-test
         run: npm run ci-test
+
+      - name: Changeset Status
+        id: changeset-status
+        if: >-
+          github.event_name == 'pull_request' &&
+          !startsWith(github.head_ref, 'changeset-release/')
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          npx changeset status --since=origin/${{ github.base_ref }}
 
   test-action:
     name: GitHub Actions Test

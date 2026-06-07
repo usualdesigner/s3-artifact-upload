@@ -16,6 +16,7 @@ export default [
       "node_modules/",
       "badges/",
       "eslint.config.mjs",
+      "script/*.mjs",
       "**/*.json",
     ],
   },
