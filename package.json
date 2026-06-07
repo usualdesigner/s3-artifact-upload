@@ -1,7 +1,7 @@
 {
   "name": "s3-artifact-upload",
   "description": "An action to upload files to an S3 bucket",
-  "version": "1.0.17",
+  "version": "2.0.0",
   "author": "Alex Bern (@usualdesigner)",
   "private": true,
   "homepage": "https://github.com/usualdesigner/s3-artifact-upload",
