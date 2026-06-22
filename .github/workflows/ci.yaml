@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # Full history so `changeset status` can find the merge-base with main.
           fetch-depth: 0
@@ -61,7 +61,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       # - name: Test Local Action
       #   id: test-action
