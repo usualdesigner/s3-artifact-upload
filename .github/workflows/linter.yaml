@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           # super-linter needs the full history and the default branch ref
           # available to resolve DEFAULT_BRANCH; a shallow clone makes it
